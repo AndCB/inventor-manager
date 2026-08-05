@@ -62,9 +62,8 @@ Before you begin, ensure you have the following installed:
 # 1. Start SQL Server 2022 (default SA password: Inventory!Dev123)
 docker compose up -d
 
-# 2. Backend: apply migrations and run (swagger at http://localhost:5147/swagger)
+# 2. Backend: run (migrations are applied and sample data is seeded automatically on first start)
 cd backend
-dotnet ef database update
 dotnet run
 
 # 3. Frontend: install and run (it points at http://localhost:5147/api by default)
@@ -101,7 +100,13 @@ npm run dev
       docker compose up -d
       ```
 
-    - Apply migrations to the database (migrations for the inventory table and the Identity user tables are included in the repo)
+    - Run the project (pending migrations are applied and the sample data is seeded automatically on first start)
+
+      ```bash
+      dotnet run
+      ```
+
+    - (Optional) Apply the migrations manually instead:
 
       ```bash
       dotnet ef database update
@@ -133,7 +138,9 @@ npm run dev
       VITE_API_URL=http://your-api-address/api
       ```
 
-## Setting up the databse
+## Setting up the database
+
+The application seeds the sample data automatically on startup when the `InventoryItems` table is empty, so a fresh database starts with demo content and no manual SQL is required.
 
 If you don't want to use EntityFramework migrations you can also create the database manually:
 

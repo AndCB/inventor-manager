@@ -2,7 +2,7 @@
 
 > **Idiomas:** [English](README.MD) | [Español](README.es.md)
 
-Este proyecto es una aplicación web que permite a los usuarios gestionar artículos de inventario y consultar los registros del inventario. El sistema incluye soporte para paginación, filtrado y ordenamiento de los artículos para mejorar la usabilidad. También incluye una interfaz fácil de usar para gestionar el inventario e interactuar con la API del backend.
+Este proyecto es una aplicación web que permite a los usuarios consultar y gestionar artículos de inventario. El sistema incluye soporte para paginación, filtrado y ordenamiento de los artículos para mejorar la usabilidad. También incluye una interfaz fácil de usar para gestionar el inventario e interactuar con la API del backend.
 
 La API permite realizar operaciones CRUD sobre los artículos del inventario, incluyendo obtener todos los artículos, obtener un artículo por ID, crear nuevos artículos, actualizar artículos existentes y eliminar artículos.
 
@@ -53,13 +53,13 @@ La API permite realizar operaciones CRUD sobre los artículos del inventario, in
 
 ## Requisitos previos
 
-Antes de comenzar, asegúrate de tener instalado lo siguiente:
+Antes de comenzar, asegúrese de tener instalado lo siguiente:
 
 - [Docker](https://www.docker.com/) (recomendado). Es la forma más sencilla de ejecutar SQL Server mediante `docker compose`.
 - [SDK de .NET 8](https://dotnet.microsoft.com/download/dotnet/8.0). El repositorio fija esta versión mediante `global.json`, así que los comandos `dotnet` la usan automáticamente.
 - [Node.js](https://nodejs.org/) (para el frontend)
 
-No se requiere una instancia existente de SQL Server: el `docker-compose.yml` incluido ejecuta SQL Server 2022 localmente. Si ya tienes tu propio SQL Server, puedes usarlo en su lugar (consulta [Instalación](#instalación)).
+No se requiere una instancia existente de SQL Server: el `docker-compose.yml` incluido ejecuta SQL Server 2022 localmente. Si ya tiene su propio SQL Server, puede usarlo en su lugar (ver [Instalación](#instalación)).
 
 ## Inicio rápido (Docker)
 
@@ -67,9 +67,8 @@ No se requiere una instancia existente de SQL Server: el `docker-compose.yml` in
 # 1. Inicia SQL Server 2022 (contraseña SA por defecto: Inventory!Dev123)
 docker compose up -d
 
-# 2. Backend: aplica las migraciones y ejecuta (swagger en http://localhost:5147/swagger)
+# 2. Backend: ejecuta (las migraciones se aplican y los datos de ejemplo se agregan automáticamente en el primer inicio)
 cd backend
-dotnet ef database update
 dotnet run
 
 # 3. Frontend: instala y ejecuta (por defecto apunta a http://localhost:5147/api)
@@ -88,37 +87,43 @@ npm run dev
 
 2.  Configura el backend:
 
-    - Ve a la carpeta del backend
+    - Vaya a la carpeta del backend
 
       ```bash
       cd backend
       ```
 
-    - Restaura los paquetes NuGet
+    - Restaure los paquetes NuGet
 
       ```bash
       dotnet restore
       ```
 
-    - Inicia SQL Server mediante Docker (la cadena de conexión en `appsettings.json` ya apunta a esta instancia):
+    - Inicie SQL Server mediante Docker (la cadena de conexión en `appsettings.json` ya apunta a esta instancia):
 
       ```bash
       docker compose up -d
       ```
 
-    - Aplica las migraciones a la base de datos (las migraciones de la tabla de inventario y de las tablas de usuarios de Identity están incluidas en el repositorio)
+    - Ejecute el proyecto (las migraciones pendientes se aplican y los datos de ejemplo se agregan automáticamente en el primer inicio)
+
+      ```bash
+      dotnet run
+      ```
+
+    - (Opcional) Aplique las migraciones manualmente en su lugar:
 
       ```bash
       dotnet ef database update
       ```
 
-    - Compila el proyecto
+    - Compilar el proyecto
 
       ```bash
       dotnet build
       ```
 
-    ¿Usas tu propio SQL Server? Sobrescribe la cadena de conexión con una variable de entorno (sin cambios de código):
+    Si quiere usar su propia instancia de SQL Server, puede sobrescribir la cadena de conexión con una variable de entorno:
 
     ```bash
     export ConnectionStrings__DefaultConnection="Server=tu-servidor;Database=Inventory;User Id=tu-usuario;Password=tu-contraseña;TrustServerCertificate=True"
@@ -126,13 +131,13 @@ npm run dev
 
 3.  Configuración del frontend:
 
-    - Ve a la carpeta del frontend
+    - Vaya a la carpeta del frontend
 
       ```bash
       cd ../frontend
       ```
 
-    - Instala los paquetes npm
+    - Instale los paquetes npm
 
       ```bash
       npm install
@@ -146,7 +151,9 @@ npm run dev
 
 ## Configuración de la base de datos
 
-Si no quieres usar las migraciones de EntityFramework, también puedes crear la base de datos manualmente:
+La aplicación agrega los datos de ejemplo automáticamente al iniciar cuando la tabla `InventoryItems` está vacía, por lo que una base de datos nueva comienza con contenido de demostración sin necesidad de SQL manual.
+
+Si no quiere usar las migraciones de EntityFramework, también puede crear la base de datos manualmente:
 
 ```sql
   CREATE TABLE [InventoryItems] (
@@ -158,7 +165,7 @@ Si no quieres usar las migraciones de EntityFramework, también puedes crear la 
    );
 ```
 
-También puedes usar los siguientes datos para poblar la base de datos:
+También puede usar los siguientes datos para poblar la base de datos:
 
 <details>
 
@@ -243,7 +250,7 @@ VALUES
 
 ## Ejecutar la aplicación
 
-Para ejecutar la aplicación localmente, usa los siguientes comandos:
+Para ejecutar la aplicación localmente, use los siguientes comandos:
 
 - backend
   ```bash
@@ -259,8 +266,8 @@ Para ejecutar la aplicación localmente, usa los siguientes comandos:
 El proyecto usa Swagger para documentar la API.
 
 1.  Inicia la API ejecutando `dotnet run` desde la carpeta `backend`.
-2.  Ve a `http://localhost:PUERTO/swagger` para explorar e interactuar con la API.
-3.  La interfaz de Swagger incluye un botón **Authorize** donde puedes pegar el JWT devuelto por los endpoints `/api/auth/login` o `/api/auth/register`.
+2.  Vaya a `http://localhost:PUERTO/swagger` para explorar e interactuar con la API.
+3.  La interfaz de Swagger incluye un botón **Authorize** donde puede pegar el JWT devuelto por los endpoints `/api/auth/login` o `/api/auth/register`.
 
 ### Autenticación
 
@@ -273,7 +280,7 @@ Ambos endpoints devuelven `{ "token": "<jwt>", "username": "..." }`. El token ex
 
 Los endpoints `GET` del inventario son públicos. Crear, actualizar y eliminar artículos requiere un JWT válido enviado en el encabezado `Authorization: Bearer <token>`.
 
-La clave de firma del JWT, el emisor y la audiencia se configuran en la sección `JWT` de `appsettings.json`. **Cambia la `Key` por un secreto fuerte y único antes de desplegar.**
+La clave de firma del JWT, el emisor y la audiencia se configuran en la sección `JWT` de `appsettings.json`. **Cambie la `Key` por un secreto fuerte y único antes de desplegar.**
 
 ## Ejecutar las pruebas unitarias
 
@@ -281,13 +288,13 @@ El proyecto incluye pruebas para el backend usando xunit y Moq para simular las 
 
 Para ejecutar las pruebas:
 
-1.  Ve a la carpeta `backendTests`:
+1.  Vaya a la carpeta `backendTests`:
 
 ```bash
 cd backendTests
 ```
 
-2.  Ejecuta las pruebas unitarias con el siguiente comando:
+2.  Ejecute las pruebas unitarias con el siguiente comando:
 
 ```bash
 dotnet test
@@ -305,4 +312,4 @@ Las pruebas cubren los endpoints del `InventoryController` y también el flujo d
 - Iniciar sesión con credenciales válidas e inválidas
 - Generar JWTs con los claims, la expiración y la firma correctos
 
-Para más información, consulta la documentación oficial de xunit en [https://xunit.net/]
+Para más información, consulte la documentación oficial de xunit en [https://xunit.net/]

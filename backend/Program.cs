@@ -134,4 +134,18 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Apply any pending migrations and seed the sample inventory data on first
+// run (when the table is empty), so a fresh database is ready with demo
+// content without manual setup steps.
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDBContext>();
+    dbContext.Database.Migrate();
+    if (!dbContext.InventoryItems.Any())
+    {
+        dbContext.InventoryItems.AddRange(SeedData.InventoryItems);
+        dbContext.SaveChanges();
+    }
+}
+
 app.Run();

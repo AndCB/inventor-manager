@@ -18,14 +18,14 @@ namespace backendTests.Controller
             var store = new Mock<IUserStore<IdentityUser>>();
             _mockUserManager = new Mock<UserManager<IdentityUser>>(
                 store.Object,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!
             );
             _mockTokenService = new Mock<ITokenService>();
             _controller = new AuthController(_mockUserManager.Object, _mockTokenService.Object);
