@@ -47,6 +47,7 @@ The API allows you to perform CRUD operations on inventory items, including fetc
 - **Typescript**: For type safety in the frontend code.
 - **Vite**: For bundling and development server.
 - **Tailwind CSS**: For styling.
+- **Vitest + React Testing Library**: For frontend unit and integration tests.
 
 ## Prerequisites
 
@@ -273,9 +274,9 @@ The JWT signing key, issuer, and audience are configured under the `JWT` section
 
 ## Running Unit Tests
 
-The project includes tests for the backend using xunit and Moq for mocking the repository dependencies.
+### Backend
 
-To run the tests:
+The backend tests use xUnit and Moq for mocking repository dependencies. To run them:
 
 1.  Navigate to `backendTests` folder:
 
@@ -283,7 +284,7 @@ To run the tests:
 cd backendTests
 ```
 
-2.  Run the unit tests using the following command:
+2.  Run the unit tests:
 
 ```bash
 dotnet test
@@ -300,5 +301,21 @@ The tests cover the `InventoryController` endpoints as well as the authenticatio
 - Rejecting duplicate usernames and weak passwords.
 - Logging in with valid and invalid credentials.
 - Generating JWTs with the correct claims, expiry, and signature.
+
+### Frontend
+
+The frontend tests use Vitest with React Testing Library, mocking the API layer so components and hooks run against deterministic data. To run them:
+
+```bash
+cd frontend
+npm test
+```
+
+The tests cover:
+
+- The login and register forms (validation, password mismatch, error snackbars).
+- The full auth flow: logged-out state, login and register switching to the inventory view, and failed logins staying on the auth page.
+- Inventory interactions: rendering, empty state, debounced filtering with page reset, and delete confirmation.
+- The `useInventory` hook: request parameters, debounce timing, and page resets.
 
 For further information check out xunit's official documantation at [https://xunit.net/]

@@ -50,6 +50,7 @@ La API permite realizar operaciones CRUD sobre los artículos del inventario, in
 - **TypeScript**: para la seguridad de tipos en el código del frontend.
 - **Vite**: para el empaquetado y el servidor de desarrollo.
 - **Tailwind CSS**: para los estilos.
+- **Vitest + React Testing Library**: para las pruebas unitarias y de integración del frontend.
 
 ## Requisitos previos
 
@@ -284,9 +285,9 @@ La clave de firma del JWT, el emisor y la audiencia se configuran en la sección
 
 ## Ejecutar las pruebas unitarias
 
-El proyecto incluye pruebas para el backend usando xunit y Moq para simular las dependencias del repositorio.
+### Backend
 
-Para ejecutar las pruebas:
+Las pruebas del backend usan xUnit y Moq para simular las dependencias del repositorio. Para ejecutarlas:
 
 1.  Vaya a la carpeta `backendTests`:
 
@@ -294,7 +295,7 @@ Para ejecutar las pruebas:
 cd backendTests
 ```
 
-2.  Ejecute las pruebas unitarias con el siguiente comando:
+2.  Ejecute las pruebas unitarias:
 
 ```bash
 dotnet test
@@ -311,5 +312,21 @@ Las pruebas cubren los endpoints del `InventoryController` y también el flujo d
 - Rechazar nombres de usuario duplicados y contraseñas débiles
 - Iniciar sesión con credenciales válidas e inválidas
 - Generar JWTs con los claims, la expiración y la firma correctos
+
+### Frontend
+
+Las pruebas del frontend usan Vitest con React Testing Library y simulan la capa de API para que los componentes y hooks se ejecuten con datos deterministas. Para ejecutarlas:
+
+```bash
+cd frontend
+npm test
+```
+
+Las pruebas cubren:
+
+- Los formularios de inicio de sesión y registro (validación, contraseñas que no coinciden, snackbars de error).
+- El flujo completo de autenticación: estado sin sesión, inicio de sesión y registro que cambian a la vista de inventario, e inicios de sesión fallidos que permanecen en la página de autenticación.
+- Las interacciones del inventario: renderizado, estado vacío, filtrado con debounce y reinicio de página, y confirmación de eliminación.
+- El hook `useInventory`: parámetros de las peticiones, tiempos del debounce y reinicios de página.
 
 Para más información, consulte la documentación oficial de xunit en [https://xunit.net/]

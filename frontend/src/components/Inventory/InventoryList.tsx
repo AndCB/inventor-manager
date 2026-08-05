@@ -2,6 +2,11 @@
 import React, { useState } from "react";
 import {
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   TextField,
   Table,
   TableBody,
@@ -43,12 +48,15 @@ const InventoryList: React.FC = () => {
     sortBy,
     isDescending,
     handleSort,
-    filter,
-    setFilter,
+    filterInput,
+    handleFilterChange,
   } = useInventory();
 
   // Styling state
   const [onHover, setOnHover] = useState("");
+
+  // The item awaiting a delete confirmation (null when no dialog is open).
+  const [deleteTarget, setDeleteTarget] = useState<InventoryItem | null>(null);
 
   return (
     <div>
@@ -89,8 +97,8 @@ const InventoryList: React.FC = () => {
       {/* Filter input */}
       <TextField
         label="Filter by Name"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
+        value={filterInput}
+        onChange={(e) => handleFilterChange(e.target.value)}
         style={{ marginTop: "16px", marginBottom: "16px" }}
       />
 
@@ -153,12 +161,14 @@ const InventoryList: React.FC = () => {
                     <IconButton
                       onClick={() => handleEdit(item)}
                       color="primary"
+                      aria-label={`Edit ${item.name}`}
                     >
                       <Edit fontSize="small" />
                     </IconButton>
                     <Button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => setDeleteTarget(item)}
                       color="secondary"
+                      aria-label={`Delete ${item.name}`}
                     >
                       <Delete fontSize="small" />
                     </Button>
@@ -181,6 +191,38 @@ const InventoryList: React.FC = () => {
         onRowsPerPageChange={handleRowsPerPageChange}
         ActionsComponent={JumpToFirstOrLast}
       />
+
+      {/* Delete confirmation dialog */}
+      <Dialog
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+      >
+        <DialogTitle>Delete item?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete "{deleteTarget?.name}"? This
+            action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteTarget(null)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={async () => {
+              if (deleteTarget) {
+                // Keep the dialog open (and the item name visible) while
+                // the request runs, then close on completion.
+                await handleDelete(deleteTarget.id);
+              }
+              setDeleteTarget(null);
+            }}
+            color="secondary"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

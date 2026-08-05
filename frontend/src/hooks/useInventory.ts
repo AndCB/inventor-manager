@@ -10,6 +10,7 @@ import {
 } from "../services/apiService";
 
 const INITIAL_ROWS_PER_PAGE = 25;
+const DEBOUNCE_DELAY_MS = 300;
 
 /**
  * Encapsulates all inventory state and side effects: data fetching, the
@@ -40,7 +41,20 @@ export function useInventory() {
   const [isDescending, setIsDescending] = useState(false);
 
   // Filtering
+  // The input value updates immediately; the actual query filter is
+  // debounced so a request only fires after the user pauses typing.
+  const [filterInput, setFilterInput] = useState("");
   const [filter, setFilter] = useState("");
+  const filterDebounceRef = useRef<number | null>(null);
+
+  // Cancel any pending debounced filter change on unmount.
+  useEffect(() => {
+    return () => {
+      if (filterDebounceRef.current !== null) {
+        window.clearTimeout(filterDebounceRef.current);
+      }
+    };
+  }, []);
 
   // Tracks the most recent request so stale responses (e.g. from rapid
   // filter typing) never overwrite newer data.
@@ -142,6 +156,21 @@ export function useInventory() {
       setSortBy(column);
       setIsDescending(false);
     }
+    // A new ordering changes which items land on each page.
+    setPage(0);
+  };
+
+  // Reset to the first page when filtering, so results that match on
+  // earlier pages are always visible instead of a stale page number.
+  const handleFilterChange = (value: string) => {
+    setFilterInput(value);
+    if (filterDebounceRef.current !== null) {
+      window.clearTimeout(filterDebounceRef.current);
+    }
+    filterDebounceRef.current = window.setTimeout(() => {
+      setFilter(value);
+      setPage(0);
+    }, DEBOUNCE_DELAY_MS);
   };
 
   const handlePageChange = (
@@ -182,6 +211,7 @@ export function useInventory() {
     isDescending,
     handleSort,
     filter,
-    setFilter,
+    filterInput,
+    handleFilterChange,
   };
 }
