@@ -28,10 +28,7 @@ namespace backend.Services
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_config["JWT:Key"]!)
             );
-            var credentials = new SigningCredentials(
-                key,
-                SecurityAlgorithms.HmacSha256Signature
-            );
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 issuer: _config["JWT:Issuer"],

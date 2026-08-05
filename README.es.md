@@ -293,12 +293,16 @@ cd backendTests
 dotnet test
 ```
 
-Las pruebas cubren varios casos para cada endpoint del `InventoryController`, como:
+Las pruebas cubren los endpoints del `InventoryController` y también el flujo de autenticación:
 
 - Obtener todos los artículos
 - Obtener un artículo por ID
 - Crear nuevos artículos
 - Actualizar artículos
 - Eliminar artículos
+- Registrar una cuenta nueva y recibir un JWT
+- Rechazar nombres de usuario duplicados y contraseñas débiles
+- Iniciar sesión con credenciales válidas e inválidas
+- Generar JWTs con los claims, la expiración y la firma correctos
 
 Para más información, consulta la documentación oficial de xunit en [https://xunit.net/]

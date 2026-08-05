@@ -282,12 +282,16 @@ cd backendTests
 dotnet test
 ```
 
-The test cover various cases for each endpoint of the `InventoryController` such as:
+The tests cover the `InventoryController` endpoints as well as the authentication flow:
 
 - Fetching all items
 - Fetching an item by Id.
 - Creating new items.
 - Updating items.
 - Deleting items.
+- Registering a new account and receiving a JWT.
+- Rejecting duplicate usernames and weak passwords.
+- Logging in with valid and invalid credentials.
+- Generating JWTs with the correct claims, expiry, and signature.
 
 For further information check out xunit's official documantation at [https://xunit.net/]
