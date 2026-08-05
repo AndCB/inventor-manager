@@ -62,6 +62,12 @@ namespace backend.Repository
 
             if (!string.IsNullOrWhiteSpace(query.SortBy))
             {
+                if (query.SortBy.Equals("Id", StringComparison.OrdinalIgnoreCase))
+                {
+                    itemsQuery = query.IsDescending
+                        ? itemsQuery.OrderByDescending(s => s.Id)
+                        : itemsQuery.OrderBy(s => s.Id);
+                }
                 if (query.SortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
                 {
                     itemsQuery = query.IsDescending

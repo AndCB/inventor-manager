@@ -6,9 +6,9 @@ import { PagedResponse } from "../models/PagedResponse";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const filterEmptyQueryParams = (params: QueryParams) => {
-  const filteredParams: any = {};
+  const filteredParams: Record<string, string | number | boolean> = {};
   Object.keys(params).forEach((key) => {
-    const value = (params as any)[key];
+    const value = params[key as keyof QueryParams];
     if (value !== null && value !== undefined && value !== "") {
       filteredParams[key] = value;
     }
