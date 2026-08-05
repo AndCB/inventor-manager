@@ -1,6 +1,61 @@
 @backend_HostAddress = http://localhost:5147
 
-GET {{backend_HostAddress}}/weatherforecast/
+### Register a new account
+POST {{backend_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "demoUser",
+  "password": "Passw0rd!"
+}
+
+###
+
+### Log in and copy the returned token into the Authorization header below
+POST {{backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "demoUser",
+  "password": "Passw0rd!"
+}
+
+###
+
+### Get all inventory items (public)
+GET {{backend_HostAddress}}/api/inventory?Page=1&PageSize=10
 Accept: application/json
+
+###
+
+### Create an item (requires auth)
+POST {{backend_HostAddress}}/api/inventory
+Content-Type: application/json
+Authorization: Bearer <your-token-here>
+
+{
+  "name": "Apple MacBook Pro 16\"",
+  "quantity": 50,
+  "price": 2399.99
+}
+
+###
+
+### Update an item (requires auth)
+PUT {{backend_HostAddress}}/api/inventory/1
+Content-Type: application/json
+Authorization: Bearer <your-token-here>
+
+{
+  "name": "Apple MacBook Pro 16\" (2024)",
+  "quantity": 45,
+  "price": 2199.99
+}
+
+###
+
+### Delete an item (requires auth)
+DELETE {{backend_HostAddress}}/api/inventory/1
+Authorization: Bearer <your-token-here>
 
 ###

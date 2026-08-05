@@ -20,6 +20,8 @@ The API allows you to perform CRUD operations on inventory items, including fetc
 - Add new inventory items to the database.
 - Update existing inventory items.
 - Delete inventory items from the database.
+- User registration and login with JWT authentication.
+- Write operations (create, update, delete) are protected and require a valid token.
 - Real-time feedback using snackbars for user actions
 
 ## Technologies Used
@@ -28,6 +30,8 @@ The API allows you to perform CRUD operations on inventory items, including fetc
 
 - **ASP.NET Core**: For building the web API.
 - **Entity Framework Core**: For interacting with the database.
+- **ASP.NET Core Identity**: For user management and password hashing.
+- **JWT (JwtBearer)**: For issuing and validating authentication tokens.
 - **xUnit**: For unit testing.
 - **Moq**: For mocking dependencies in tests.
 - **SQL Server**: For database management.
@@ -46,9 +50,26 @@ The API allows you to perform CRUD operations on inventory items, including fetc
 
 Before you begin, ensure you have the following installed:
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (optional, depending on your database provider).
+- [Docker](https://www.docker.com/) (recommended) — the easiest way to run SQL Server via `docker compose`.
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) — the repo pins this version via `global.json`, so `dotnet` commands automatically use it.
 - [Node.js](https://nodejs.org/) (for the frontend)
+
+## Quick Start (Docker)
+
+```bash
+# 1. Start SQL Server 2022 (default SA password: Inventory!Dev123)
+docker compose up -d
+
+# 2. Backend: apply migrations and run (swagger at http://localhost:5147/swagger)
+cd backend
+dotnet ef database update
+dotnet run
+
+# 3. Frontend: install and run (first create frontend/.env.local with VITE_API_URL=http://localhost:5147/api)
+cd ../frontend
+npm install
+npm run dev
+```
 
 ## Installation
 
@@ -72,15 +93,13 @@ Before you begin, ensure you have the following installed:
       dotnet restore
       ```
 
-    - Change the connection string in `appsettings.json` to point to the appropiate SQL Server database
+    - Start SQL Server via Docker (the connection string in `appsettings.json` already targets this instance):
 
-      ```json
-      "ConnectionStrings": {
-         "DefaultConnection": "Server=localhost;Database=ExampleDB;Trusted_Connection=True;"
-      }
+      ```bash
+      docker compose up -d
       ```
 
-    - Apply migrations to the database
+    - Apply migrations to the database (migrations for the inventory table and the Identity user tables are included in the repo)
 
       ```bash
       dotnet ef database update
@@ -106,10 +125,10 @@ Before you begin, ensure you have the following installed:
       npm install
       ```
 
-    - Create a `.env.local` file with the address to the api
+    - Create a `.env.local` file with the address of the api (the default `dotnet run` port is 5147):
 
       ```bash
-      VITE_API_URL=http://localhost:1234/api
+      VITE_API_URL=http://localhost:5147/api
       ```
 
 ## Setting up the databse
@@ -228,6 +247,20 @@ The project uses Swagger for documenting the API.
 
 1.  Start the API by running `dotnet run` from the `backend` folder.
 2.  Navigate to `http:\\localhost:PORT/swagger` to explore and interact with the API.
+3.  The Swagger UI includes an **Authorize** button where you can paste the JWT returned by the `/api/auth/login` or `/api/auth/register` endpoints.
+
+### Authentication
+
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| `/api/auth/register` | POST | Registers a new account. Body: `{ "username": "...", "password": "..." }` |
+| `/api/auth/login` | POST | Logs in and returns a JWT. Body: `{ "username": "...", "password": "..." }` |
+
+Both endpoints return `{ "token": "<jwt>", "username": "..." }`. The token expires after 24 hours.
+
+The `GET` inventory endpoints are public. Creating, updating, and deleting items requires a valid JWT sent as the `Authorization: Bearer <token>` header.
+
+The JWT signing key, issuer, and audience are configured under the `JWT` section of `appsettings.json`. **Change the `Key` to a strong, unique secret before deploying.**
 
 ## Running Unit Tests
 

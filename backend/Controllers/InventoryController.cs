@@ -1,8 +1,7 @@
-using backend.Data;
 using backend.Helpers;
 using backend.Interfaces;
 using backend.Models;
-using backend.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -67,6 +66,8 @@ namespace backend.Controllers
         ///<returns> The added item</returns>
         ///<response code="200">Item created successfully</response>
         ///<response code="400">The item is invalid</response>
+        ///<response code="401">Authentication required</response>
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<InventoryItemDTO>> Add(
             [FromBody] InventoryItemDTO newItem
@@ -88,7 +89,9 @@ namespace backend.Controllers
         ///<returns> The updated item</returns>
         ///<response code="200">Item correctly updated</response>
         ///<response code="400">There was an issue with the request</response>
+        ///<response code="401">Authentication required</response>
         ///<response code="404">No item found for the given id</response>
+        [Authorize]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -114,7 +117,9 @@ namespace backend.Controllers
         /// <param name="id">The ID of the inventory item to delete</param>
         ///<response code="204">Item correctly deleted</response>
         ///<response code="400">There was an issue with the request</response>
+        ///<response code="401">Authentication required</response>
         ///<response code="404">No item found for the given id</response>
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
