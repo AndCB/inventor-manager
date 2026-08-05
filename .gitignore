@@ -1,4 +1,4 @@
-# Environment files (secrets) — commit .env.example, never .env
+# Environment files (secrets); commit .env.example, never .env
 .env
 .env.*
 !.env.example

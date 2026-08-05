@@ -1,5 +1,7 @@
 # Inventory Management API
 
+> **Languages:** [English](README.MD) | [Español](README.es.md)
+
 This project is a web-based application that allows users to manage inventory items and viewing inventory records. The system supports pagination, filtering, and sorting of inventory items to enhance usability. It also features an easy-to-use UI for managing inventory and interacting with the backend API.
 The API allows you to perform CRUD operations on inventory items, including fetching all items, fetching an item by ID, creating new items, updating existing items, and deleting items.
 
@@ -50,8 +52,8 @@ The API allows you to perform CRUD operations on inventory items, including fetc
 
 Before you begin, ensure you have the following installed:
 
-- [Docker](https://www.docker.com/) (recommended) — the easiest way to run SQL Server via `docker compose`.
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) — the repo pins this version via `global.json`, so `dotnet` commands automatically use it.
+- [Docker](https://www.docker.com/) (recommended). The easiest way to run SQL Server via `docker compose`.
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0). The repo pins this version via `global.json`, so `dotnet` commands automatically use it.
 - [Node.js](https://nodejs.org/) (for the frontend)
 
 ## Quick Start (Docker)
