@@ -4,7 +4,8 @@ import { QueryParams } from "../models/QueryParams";
 import { PagedResponse } from "../models/PagedResponse";
 import { AuthResponse } from "../models/Auth";
 
-const API_URL = import.meta.env.VITE_API_URL;
+// Fallback to the default local API so the app works without a .env file.
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5147/api";
 const TOKEN_KEY = "token";
 
 const filterEmptyQueryParams = (params: QueryParams) => {

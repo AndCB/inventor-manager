@@ -72,7 +72,7 @@ cd backend
 dotnet ef database update
 dotnet run
 
-# 3. Frontend: instala y ejecuta (primero crea frontend/.env.local con VITE_API_URL=http://localhost:5147/api)
+# 3. Frontend: instala y ejecuta (por defecto apunta a http://localhost:5147/api)
 cd ../frontend
 npm install
 npm run dev
@@ -138,10 +138,10 @@ npm run dev
       npm install
       ```
 
-    - Crea un archivo `.env.local` con la dirección de la API (el puerto por defecto de `dotnet run` es 5147):
+    - No se requiere ningún archivo de entorno: el frontend apunta a `http://localhost:5147/api` por defecto. Para cambiarlo, puede crear un archivo `.env.local` con la dirección:
 
       ```bash
-      VITE_API_URL=http://localhost:5147/api
+      VITE_API_URL=http://tu-direccion-de-api/api
       ```
 
 ## Configuración de la base de datos
