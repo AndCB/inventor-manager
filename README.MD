@@ -14,6 +14,7 @@ The API allows you to perform CRUD operations on inventory items, including fetc
 - [Running the Application](#running-the-application)
 - [API Documentation](#api-documentation)
 - [Running Unit Tests](#running-unit-tests)
+- [Deployment (Free Tier)](#deployment-free-tier)
 
 ## Features
 
@@ -319,3 +320,66 @@ The tests cover:
 - The `useInventory` hook: request parameters, debounce timing, and page resets.
 
 For further information check out xunit's official documantation at [https://xunit.net/]
+
+## Deployment (Free Tier)
+
+This stack deploys for free, entirely outside AWS:
+
+- **Frontend**: [Vercel](https://vercel.com) free tier (static Vite build).
+- **Backend**: [Azure Container Apps](https://azure.microsoft.com/en-us/products/container-apps/) free consumption plan (Docker container).
+- **Database**: [Azure SQL Database free offer](https://learn.microsoft.com/en-us/azure/azure-sql/database/free-offer) (managed SQL Server, free forever within limits).
+
+> An Azure account is required. A standard free account asks for a credit card at signup for verification (never charged while you stay within the free tiers). Students can use the card-free Azure for Students path (sign up through GitHub Education); note that the free SQL offer is not available on the `Azure for Students Starter` tier. Whichever path you pick, confirm the database shows the free offer tier and keep the default `Auto-pause the database until next month` setting.
+
+### 1. Create the free database
+
+1.  Sign in to the [Azure portal](https://portal.azure.com) and create a new **SQL Database**.
+2.  Choose the **free offer** pricing tier (100,000 vCore-seconds and 32 GB per month, free forever). Confirm the pricing tier shows the free offer before creating, and keep the default `Auto-pause the database until next month` behavior.
+3.  Create a server with an admin login and a strong password.
+4.  In the server's **Networking** settings, enable **Allow Azure services and resources to access this server** (the API will run inside Azure, so this is what lets it connect).
+5.  Copy the connection string. It has this shape: `Server=tcp:<server>.database.windows.net,1433;Database=Inventory;User Id=<user>;Password=<password>;Encrypt=True`.
+
+The free database auto-pauses after inactivity. The API retries connections on startup and during queries, so the wake-up is transparent.
+
+### 2. Build and push the backend container
+
+From the repository root (you need a free [Docker Hub](https://hub.docker.com) account):
+
+```bash
+docker build -f backend/Dockerfile -t <your-dockerhub-user>/inventory-api:latest .
+docker push <your-dockerhub-user>/inventory-api:latest
+```
+
+### 3. Deploy the API to Azure Container Apps
+
+1.  Create a **Container App** and choose the **free consumption plan**.
+2.  Point it at your image (`<your-dockerhub-user>/inventory-api:latest`) and set the **target port to 8080**.
+3.  Enable HTTPS ingress and accept traffic from anywhere.
+4.  Add these environment variables:
+
+    | Variable | Value |
+    | --- | --- |
+    | `ConnectionStrings__DefaultConnection` | Your Azure SQL connection string from step 1 |
+    | `JWT__Key` | A strong, unique secret (replace the default development key) |
+    | `CORS__AllowedOrigins` | `https://<your-vercel-app>.vercel.app` |
+    | `ASPNETCORE_ENVIRONMENT` | `Production` |
+
+5.  Deploy. On first boot the app applies the migrations and seeds the 73 sample items automatically.
+
+Test the API at `https://<your-app-url>/api/inventory`.
+
+> Azure Container Apps uses a TCP health check by default, which works as-is. If you configure an HTTP health probe instead, point it at `/api/inventory` (the root path returns 404).
+
+### 4. Deploy the frontend to Vercel
+
+1.  Import this repository on [Vercel](https://vercel.com). The Vite framework is detected automatically.
+2.  Add the environment variable `VITE_API_URL=https://<your-app-url>/api` and deploy.
+
+That's it. Register an account and the inventory view loads the seeded sample data.
+
+### Free tier notes
+
+- The API container scales to zero after inactivity, so the first request after a pause can take a few seconds.
+- The Azure SQL free offer auto-pauses the same way; the retry logic handles the wake-up.
+- Keep `JWT__Key` secret and unique. Anyone with it can forge authentication tokens.
+- The local development flow (Docker Compose + SQL Server + `dotnet run`) is unchanged.
