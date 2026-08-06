@@ -5,12 +5,24 @@
 This project is a web-based application that allows users to manage inventory items and viewing inventory records. The system supports pagination, filtering, and sorting of inventory items to enhance usability. It also features an easy-to-use UI for managing inventory and interacting with the backend API.
 The API allows you to perform CRUD operations on inventory items, including fetching all items, fetching an item by ID, creating new items, updating existing items, and deleting items.
 
+## Live Demo
+
+ - **App:** https://icy-tree-0dc80d31e.7.azurestaticapps.net/
+ - **API:** https://inv-man-b0gfatatf7h0bkc4.westus3-01.azurewebsites.net 
+
+  > Hosted on Azure: React frontend on Azure Static Web Apps, .NET backend on Azure App Service (F1), and Azure SQL Database.
+  > The backend may take a few seconds to respond on first load.
+
 ## Table of Contents
 
 - [Features](#features)
 - [Technologies Used](#technologies-used)
+- [Architecture](#architecture)
+- [Local Development](#local-development)
 - [Prerequisites](#prerequisites)
+- [Quick Start (Docker)](#quick-start-docker)
 - [Installation](#installation)
+- [Setting up the database](#setting-up-the-database)
 - [Running the Application](#running-the-application)
 - [API Documentation](#api-documentation)
 - [Running Unit Tests](#running-unit-tests)
@@ -49,6 +61,28 @@ The API allows you to perform CRUD operations on inventory items, including fetc
 - **Vite**: For bundling and development server.
 - **Tailwind CSS**: For styling.
 - **Vitest + React Testing Library**: For frontend unit and integration tests.
+
+## Architecture
+
+The application follows a three-tier architecture hosted entirely on Azure:
+
+- **Frontend (Azure Static Web Apps):** a React single-page application built with Vite. It consumes the inventory API and is served from Azure's global edge network.
+- **Backend (Azure App Service, .NET 8, free F1 tier):** an ASP.NET Core Web API that exposes the REST endpoints, applies Entity Framework Core migrations, and handles JWT authentication.
+- **Database (Azure SQL Database):** a managed relational database that stores the inventory items and the user accounts managed by ASP.NET Core Identity.
+
+```mermaid
+graph LR
+    A["React + Vite<br/>Azure Static Web Apps"] -->|"HTTPS / JSON"| B["ASP.NET Core API<br/>Azure App Service (F1)"]
+    B --> C["Azure SQL Database"]
+```
+
+## Local Development
+
+For local development, a local SQL Server instance is provided via Docker, so you don't need to install SQL Server directly.
+
+1. Start the SQL Server container with `docker compose up -d`. The `docker-compose.yml` file at the repository root runs SQL Server 2022 with the connection string already configured in `appsettings.json`.
+2. Run the backend from the `backend` folder with `dotnet run`. Pending migrations are applied and the sample data is seeded automatically on first start.
+3. Run the frontend from the `frontend` folder with `npm run dev`. It points at `http://localhost:5147/api` by default.
 
 ## Prerequisites
 

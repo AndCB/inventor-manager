@@ -6,10 +6,20 @@ Este proyecto es una aplicación web que permite a los usuarios consultar y gest
 
 La API permite realizar operaciones CRUD sobre los artículos del inventario, incluyendo obtener todos los artículos, obtener un artículo por ID, crear nuevos artículos, actualizar artículos existentes y eliminar artículos.
 
+## Demostración en vivo
+
+ - **Aplicación:** https://icy-tree-0dc80d31e.7.azurestaticapps.net/
+ - **API:** https://inv-man-b0gfatatf7h0bkc4.westus3-01.azurewebsites.net
+
+  > Alojado en Azure: frontend de React en Azure Static Web Apps, backend de .NET en Azure App Service (F1) y Azure SQL Database.
+  > El backend puede tardar unos segundos en responder en la primera carga.
+
 ## Tabla de contenidos
 
 - [Características](#características)
 - [Tecnologías utilizadas](#tecnologías-utilizadas)
+- [Arquitectura](#arquitectura)
+- [Desarrollo local](#desarrollo-local)
 - [Requisitos previos](#requisitos-previos)
 - [Inicio rápido (Docker)](#inicio-rápido-docker)
 - [Instalación](#instalación)
@@ -53,6 +63,28 @@ La API permite realizar operaciones CRUD sobre los artículos del inventario, in
 - **Tailwind CSS**: para los estilos.
 - **Vitest + React Testing Library**: para las pruebas unitarias y de integración del frontend.
 
+## Arquitectura
+
+La aplicación sigue una arquitectura de tres capas alojada por completo en Azure:
+
+- **Frontend (Azure Static Web Apps):** una aplicación de página única (SPA) en React creada con Vite. Consume la API de inventario.
+- **Backend (Azure App Service, .NET 8, nivel gratuito F1):** una API web de ASP.NET Core que expone los endpoints REST, aplica las migraciones de Entity Framework Core y gestiona la autenticación JWT.
+- **Base de datos (Azure SQL Database):** una base de datos relacional que almacena los artículos del inventario y las cuentas de usuario gestionadas mediante ASP.NET Core Identity.
+
+```mermaid
+graph LR
+    A["Frontend<br/>React + Vite<br/>Azure Static Web Apps"] -->|"HTTPS / JSON"| B["Backend<br/>ASP.NET Core API<br/>Azure App Service (F1)"]
+    B --> C["Azure SQL Database"]
+```
+
+## Desarrollo local
+
+Para el desarrollo local, se utiliza una instancia local de SQL Server mediante Docker, de modo que no necesita instalar SQL Server directamente.
+
+1. Inicie el contenedor de SQL Server con `docker compose up -d`. El archivo `docker-compose.yml` en la raíz del repositorio ejecuta SQL Server 2022 con la cadena de conexión ya configurada en `appsettings.json`.
+2. Ejecute el backend desde la carpeta `backend` con `dotnet run`. Las migraciones pendientes se aplican y los datos de ejemplo se agregan automáticamente en el primer inicio.
+3. Ejecute el frontend desde la carpeta `frontend` con `npm run dev`. Por defecto apunta a `http://localhost:5147/api`.
+
 ## Requisitos previos
 
 Antes de comenzar, asegúrese de tener instalado lo siguiente:
@@ -66,14 +98,14 @@ No se requiere una instancia existente de SQL Server: el `docker-compose.yml` in
 ## Inicio rápido (Docker)
 
 ```bash
-# 1. Inicia SQL Server 2022 (contraseña SA por defecto: Inventory!Dev123)
+# 1. Inicie SQL Server 2022 (contraseña SA por defecto: Inventory!Dev123)
 docker compose up -d
 
-# 2. Backend: ejecuta (las migraciones se aplican y los datos de ejemplo se agregan automáticamente en el primer inicio)
+# 2. Backend: ejecute (las migraciones se aplican y los datos de ejemplo se agregan automáticamente en el primer inicio)
 cd backend
 dotnet run
 
-# 3. Frontend: instala y ejecuta (por defecto apunta a http://localhost:5147/api)
+# 3. Frontend: instale y ejecute (por defecto apunta a http://localhost:5147/api)
 cd ../frontend
 npm install
 npm run dev
@@ -81,13 +113,13 @@ npm run dev
 
 ## Instalación
 
-1.  Clona el repositorio:
+1.  Clone el repositorio:
 
     ```bash
     git clone https://github.com/andcb/inventory-management-api.git
     ```
 
-2.  Configura el backend:
+2.  Configure el backend:
 
     - Vaya a la carpeta del backend
 
@@ -128,7 +160,7 @@ npm run dev
     Si quiere usar su propia instancia de SQL Server, puede sobrescribir la cadena de conexión con una variable de entorno:
 
     ```bash
-    export ConnectionStrings__DefaultConnection="Server=tu-servidor;Database=Inventory;User Id=tu-usuario;Password=tu-contraseña;TrustServerCertificate=True"
+    export ConnectionStrings__DefaultConnection="Server=su-servidor;Database=Inventory;User Id=su-usuario;Password=su-contraseña;TrustServerCertificate=True"
     ```
 
 3.  Configuración del frontend:
@@ -148,7 +180,7 @@ npm run dev
     - No se requiere ningún archivo de entorno: el frontend apunta a `http://localhost:5147/api` por defecto. Para cambiarlo, puede crear un archivo `.env.local` con la dirección:
 
       ```bash
-      VITE_API_URL=http://tu-direccion-de-api/api
+      VITE_API_URL=http://direccion-de-api/api
       ```
 
 ## Configuración de la base de datos
@@ -267,7 +299,7 @@ Para ejecutar la aplicación localmente, use los siguientes comandos:
 
 El proyecto usa Swagger para documentar la API.
 
-1.  Inicia la API ejecutando `dotnet run` desde la carpeta `backend`.
+1.  Inicie la API ejecutando `dotnet run` desde la carpeta `backend`.
 2.  Vaya a `http://localhost:PUERTO/swagger` para explorar e interactuar con la API.
 3.  La interfaz de Swagger incluye un botón **Authorize** donde puede pegar el JWT devuelto por los endpoints `/api/auth/login` o `/api/auth/register`.
 
